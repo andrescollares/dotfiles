@@ -32,32 +32,42 @@ set signcolumn=number
 " Plug
 call plug#begin(stdpath('data') . '/plugged')
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
-Plug 'tpope/vim-fugitive'
+" == Appearance
+Plug 'glepnir/dashboard-nvim'
 
-Plug 'morhetz/gruvbox'
+Plug 'ajmwagar/vim-deus'
+" Plug 'morhetz/gruvbox'
+
+Plug 'romgrk/barbar.nvim'
 
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
 
-Plug 'akinsho/nvim-toggleterm.lua'
-
-Plug 'b3nj5m1n/kommentary'
-
-Plug 'tversteeg/registers.nvim', { 'branch': 'main' }
-
 Plug 'lukas-reineke/indent-blankline.nvim'
+
+" == QoL
+Plug 'tversteeg/registers.nvim', { 'branch': 'main' }
 
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'tpope/vim-fugitive'
 
-Plug 'glepnir/dashboard-nvim'
+Plug 'b3nj5m1n/kommentary'
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 call plug#end()
 
+" Theme
+color deus
+"autocmd vimenter * ++nested colorscheme gruvbox
+
+" Icons
+:lua require('nvim-web-devicons').setup { default = true; }
+
+" Start
 let g:indentLine_fileTypeExclude = ['dashboard']
 let g:dashboard_custom_header = [
     \'',
@@ -81,16 +91,6 @@ let g:dashboard_custom_header = [
     \]
 
 let g:dashboard_default_executive ='telescope'
-" let g:dashboard_preview_command = 'cat'
-" let g:dashboard_preview_pipeline = 'lolcat'
-" let g:dashboard_preview_file = "~/.config/nvim/sunjon-nc.cat"
-" let g:dashboard_preview_file_height = 12
-" let g:dashboard_preview_file_width = 80
-
-
-
-
-autocmd vimenter * ++nested colorscheme gruvbox
 
 :lua require('indent_blankline').setup {char = "|", buftype_exclude = {"terminal"}}
 
@@ -99,9 +99,137 @@ let g:indent_blankline_use_treesitter = v:true
 let g:indent_blankline_show_first_indent_level = v:false
 let g:indent_blankline_show_end_of_line = v:true
 
+" Comments
+:lua require('kommentary.config').use_extended_mappings()
 
-" :lua require('kommentary.config').use_extended_mappings()
+" Telescope
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
+lua << EOF
+require('telescope').setup{
+    defaults = {
+    vimgrep_arguments = {
+      'rg',
+      '--color=never',
+      '--no-heading',
+      '--with-filename',
+      '--line-number',
+      '--column',
+      '--smart-case'
+    },
+    prompt_prefix = "> ",
+    selection_caret = "> ",
+    entry_prefix = "  ",
+    initial_mode = "insert",
+    selection_strategy = "reset",
+    sorting_strategy = "descending",
+    layout_strategy = "horizontal",
+    layout_config = {
+      horizontal = {
+        mirror = false,
+      },
+      vertical = {
+        mirror = false,
+      },
+    },
+    file_sorter =  require'telescope.sorters'.get_fuzzy_file,
+    file_ignore_patterns = {"node_modules"},
+    generic_sorter =  require'telescope.sorters'.get_generic_fuzzy_sorter,
+    winblend = 0,
+    border = {},
+    borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    color_devicons = true,
+    use_less = true,
+    path_display = {},
+    set_env = { ['COLORTERM'] = 'truecolor' }, -- default = nil,
+    file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
+    grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
+    qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
+
+    -- Developer configurations: Not meant for general override
+    buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
+  }
+}
+EOF
+
+" Lualine
+lua << EOF
+require'lualine'.setup {
+  options = {
+    icons_enabled = true,
+    theme = 'gruvbox',
+    component_separators = {'', ''},
+    section_separators = {'', ''},
+    disabled_filetypes = {}
+  },
+  sections = {
+    lualine_a = {'mode'},
+    lualine_b = {'branch'},
+    lualine_c = {'filename'},
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {'filename'},
+    lualine_x = {'location'},
+    lualine_y = {},
+    lualine_z = {}
+  },
+  tabline = {},
+  extensions = {}
+}
+EOF
+
+" BarBar
+	" Move to previous/next
+nnoremap <silent>    <A-,> :BufferPrevious<CR>
+nnoremap <silent>    <A-.> :BufferNext<CR>
+	" Re-order to previous/next
+nnoremap <silent>    <A-<> :BufferMovePrevious<CR>
+nnoremap <silent>    <A->> :BufferMoveNext<CR>
+	" Goto buffer in position...
+nnoremap <silent>    <A-1> :BufferGoto 1<CR>
+nnoremap <silent>    <A-2> :BufferGoto 2<CR>
+nnoremap <silent>    <A-3> :BufferGoto 3<CR>
+nnoremap <silent>    <A-4> :BufferGoto 4<CR>
+nnoremap <silent>    <A-5> :BufferGoto 5<CR>
+nnoremap <silent>    <A-6> :BufferGoto 6<CR>
+nnoremap <silent>    <A-7> :BufferGoto 7<CR>
+nnoremap <silent>    <A-8> :BufferGoto 8<CR>
+nnoremap <silent>    <A-9> :BufferLast<CR>
+	" Pin/unpin buffer
+nnoremap <silent>    <A-p> :BufferPin<CR>
+	" Close buffer
+nnoremap <silent>    <A-c> :BufferClose<CR>
+	" Wipeout buffer
+"                          :BufferWipeout<CR>
+	" Close commands
+"                          :BufferCloseAllButCurrent<CR>
+"                          :BufferCloseAllButPinned<CR>
+"                          :BufferCloseBuffersLeft<CR>
+"                          :BufferCloseBuffersRight<CR>
+	" Magic buffer-picking mode
+nnoremap <silent> <C-s>    :BufferPick<CR>
+	" Sort automatically by...
+nnoremap <silent> <Space>bb :BufferOrderByBufferNumber<CR>
+nnoremap <silent> <Space>bd :BufferOrderByDirectory<CR>
+nnoremap <silent> <Space>bl :BufferOrderByLanguage<CR>
+nnoremap <silent> <Space>bw :BufferOrderByWindowNumber<CR>
+
+" Terminal shortcuts
+:tnoremap <Esc> <C-\><C-n>
+:tnoremap <C-h> <C-\><C-n><C-W>h
+:tnoremap <C-j> <C-\><C-n><C-W>j
+:tnoremap <C-k> <C-\><C-n><C-W>k
+:tnoremap <C-l> <C-\><C-n><C-W>l
+
+" Coc
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
@@ -209,137 +337,7 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
-" Terminal
-lua << EOF
-require("toggleterm").setup{
-  -- size can be a number or function which is passed the current terminal
-  size = 10, 
-  open_mapping = [[<c-\>]],
-  hide_numbers = true, -- hide the number column in toggleterm buffers
-  -- shade_filetypes = {},
-  shade_terminals = true,
-  shading_factor = '1', -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
-  start_in_insert = true,
-  insert_mappings = true, -- whether or not the open mapping applies in insert mode
-  persist_size = true,
-  direction = 'horizontal',--'vertical' | 'horizontal' | 'window' | 'float',
-  close_on_exit = true, -- close the terminal window when the process exits
-  shell = vim.o.shell, -- change the default shell
-  -- This field is only relevant if direction is set to 'float'
-  float_opts = {
-    -- The border key is *almost* the same as 'nvim_open_win'
-    -- see :h nvim_open_win for details on borders however
-    -- the 'curved' border is a custom border type
-    -- not natively supported but implemented in this plugin.
-    border = 'curved',--'single' | 'double' | 'shadow' | 'curved' | ... other options supported by win open
-    width = 50,
-    height = 15,
-    winblend = 3,
-    highlights = {
-      border = "Normal",
-      background = "Normal",
-    }
-  }
-}
-EOF
-
-" Telescope
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
-lua << EOF
-require('telescope').setup{
-    defaults = {
-    vimgrep_arguments = {
-      'rg',
-      '--color=never',
-      '--no-heading',
-      '--with-filename',
-      '--line-number',
-      '--column',
-      '--smart-case'
-    },
-    prompt_prefix = "> ",
-    selection_caret = "> ",
-    entry_prefix = "  ",
-    initial_mode = "insert",
-    selection_strategy = "reset",
-    sorting_strategy = "descending",
-    layout_strategy = "horizontal",
-    layout_config = {
-      horizontal = {
-        mirror = false,
-      },
-      vertical = {
-        mirror = false,
-      },
-    },
-    file_sorter =  require'telescope.sorters'.get_fuzzy_file,
-    file_ignore_patterns = {"node_modules"},
-    generic_sorter =  require'telescope.sorters'.get_generic_fuzzy_sorter,
-    winblend = 0,
-    border = {},
-    borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
-    color_devicons = true,
-    use_less = true,
-    path_display = {},
-    set_env = { ['COLORTERM'] = 'truecolor' }, -- default = nil,
-    file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
-    grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
-    qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
-
-    -- Developer configurations: Not meant for general override
-    buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
-  }
-}
-EOF
-
-lua << EOF
-require'nvim-web-devicons'.setup {
-    override = {};
-    default = true;
-}
-EOF
-
-lua << EOF
-require'lualine'.setup {
-  options = {
-    icons_enabled = true,
-    theme = 'gruvbox',
-    component_separators = {'', ''},
-    section_separators = {'', ''},
-    disabled_filetypes = {}
-  },
-  sections = {
-    lualine_a = {'mode'},
-    lualine_b = {'branch'},
-    lualine_c = {'filename'},
-    lualine_x = {'encoding', 'fileformat', 'filetype'},
-    lualine_y = {'progress'},
-    lualine_z = {'location'}
-  },
-  inactive_sections = {
-    lualine_a = {},
-    lualine_b = {},
-    lualine_c = {'filename'},
-    lualine_x = {'location'},
-    lualine_y = {},
-    lualine_z = {}
-  },
-  tabline = {},
-  extensions = {}
-}
-EOF
-
-:tnoremap <Esc> <C-\><C-n>
-:tnoremap <C-h> <C-\><C-n><C-W>h
-:tnoremap <C-j> <C-\><C-n><C-W>j
-:tnoremap <C-k> <C-\><C-n><C-W>k
-:tnoremap <C-l> <C-\><C-n><C-W>l
-
-" MD preview
+" MarkDown preview
 " set to 1, nvim will open the preview window after entering the markdown buffer
 " default: 0
 let g:mkdp_auto_start = 1

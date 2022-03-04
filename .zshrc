@@ -100,8 +100,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias code='/mnt/c/Users/Andrés/AppData/Local/Programs/Microsoft\ VS\ Code/bin/code'
-
 export PATH="$HOME/.npm/bin:$HOME/.local/bin:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 export COLORTERM=truecolor

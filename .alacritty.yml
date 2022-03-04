@@ -1,0 +1,31 @@
+window:
+  dimensions:
+    columns: 75
+    lines: 33
+
+  padding:
+    x: 10
+    y: 5
+
+  decorations: none
+
+  startup_mode: Windowed
+
+background_opacity: 0.95
+
+font:
+  size: 15
+  normal:
+    family: Iosevka Term
+
+cursor:
+  style: Underline
+
+selection:
+    semantic_escape_chars: ",│`|:\"' ()[]{}<>"
+
+    # When set to `true`, selected text will be copied to the primary clipboard.
+    save_to_clipboard: true
+
+mouse_bindings:
+    - { mouse: Middle, action: PasteSelection }
