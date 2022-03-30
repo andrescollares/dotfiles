@@ -8,7 +8,7 @@ set nobackup
 set nowritebackup
 
 " Give more space for displaying messages.
-set cmdheight=2
+"set cmdheight=2
 
 " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
 " delays and poor user experience.
@@ -26,8 +26,16 @@ set expandtab
 
 set scrolloff=3
 
+" Enable persistent undo so that undo history persists across vim sessions
+set undofile
+set undodir=~/.config/nvim/undo
+
 " Unir la columna de numero de línea con la de signo
 set signcolumn=number
+
+" Abrir el archivo en el último lugar editado
+autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
 
 " Plug
 call plug#begin(stdpath('data') . '/plugged')
@@ -48,21 +56,24 @@ Plug 'kyazdani42/nvim-web-devicons'
 Plug 'lukas-reineke/indent-blankline.nvim'
 
 " == QoL
-Plug 'tversteeg/registers.nvim', { 'branch': 'main' }
-
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+
+Plug 'ms-jpq/chadtree', {'branch': 'chad', 'do': 'python3 -m chadtree deps'}
+
+Plug 'stevearc/aerial.nvim'
+
+Plug 'tversteeg/registers.nvim', { 'branch': 'main' }
 
 Plug 'tpope/vim-fugitive'
 
 Plug 'b3nj5m1n/kommentary'
 
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
 call plug#end()
 
 " Theme
-color deus
-"autocmd vimenter * ++nested colorscheme gruvbox
+colorscheme deus
 
 " Icons
 :lua require('nvim-web-devicons').setup { default = true; }
@@ -70,9 +81,6 @@ color deus
 " Start
 let g:indentLine_fileTypeExclude = ['dashboard']
 let g:dashboard_custom_header = [
-    \'',
-    \'',
-    \'',
     \'   ⣴⣶⣤⡤⠦⣤⣀⣤⠆     ⣈⣭⣭⣿⣶⣿⣦⣼⣆         ',
     \'    ⠉⠻⢿⣿⠿⣿⣿⣶⣦⠤⠄⡠⢾⣿⣿⡿⠋⠉⠉⠻⣿⣿⡛⣦       ',
     \'          ⠈⢿⣿⣟⠦ ⣾⣿⣿⣷⠄⠄⠄⠄⠻⠿⢿⣿⣧⣄     ',
@@ -84,9 +92,6 @@ let g:dashboard_custom_header = [
     \' ⠙⠃   ⣼⣿⡟  ⠈⠻⣿⣿⣦⣌⡇⠻⣿⣿⣷⣿⣿⣿ ⣿⣿⡇⠄⠛⠻⢷⣄ ',
     \'      ⢻⣿⣿⣄   ⠈⠻⣿⣿⣿⣷⣿⣿⣿⣿⣿⡟ ⠫⢿⣿⡆     ',
     \'       ⠻⣿⣿⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣀⣤⣾⡿⠃     ',
-    \'',
-    \'',
-    \'',
     \'',
     \]
 
@@ -126,7 +131,7 @@ require('telescope').setup{
     initial_mode = "insert",
     selection_strategy = "reset",
     sorting_strategy = "descending",
-    layout_strategy = "horizontal",
+    layout_strategy = "vertical",
     layout_config = {
       horizontal = {
         mirror = false,
@@ -155,15 +160,113 @@ require('telescope').setup{
 }
 EOF
 
+" ChadTree
+nnoremap <leader>v <cmd>CHADopen<cr>
+
+" Aerial
+lua << EOF
+require("aerial").setup({
+  backends = { "treesitter", "markdown", "lsp" },
+  close_behavior = "close",
+  default_bindings = true,
+  default_direction = "float",
+  disable_max_lines = 10000,
+  -- A list of all symbols to display. Set to false to display all symbols.
+  -- To see all available values, see :help SymbolKind
+  filter_kind = {
+    "Class",
+    "Constructor",
+    "Enum",
+    "Function",
+    "Interface",
+    "Module",
+    "Method",
+    "Struct",
+  },
+  -- Enum: split_width, full_width, last, none
+  highlight_mode = "split_width",
+  highlight_closest = true,
+  highlight_on_jump = 300,
+  icons = {},
+  ignore = {
+    unlisted_buffers = true,
+
+    filetypes = {},
+
+    buftypes = "special",
+
+    wintypes = "special",
+  },
+  -- When you fold code with za, zo, or zc, update the aerial tree as well.
+  -- Only works when manage_folds = true
+  link_folds_to_tree = false,
+  -- Fold code when you open/collapse symbols in the tree.
+  link_tree_to_folds = true,
+  -- Use symbol tree for folding. Set to true or false to enable/disable
+  manage_folds = false,
+  max_width = { 80, 0.6 },
+  width = nil,
+  min_width = 10,
+  nerd_font = "auto",
+  on_attach = nil,
+  open_automatic = false,
+  -- Set to true to only open aerial at the far right/left of the editor
+  placement_editor_edge = false,
+  -- Run this command after jumping to a symbol (false will disable)
+  post_jump_cmd = "normal! zz",
+  close_on_select = true,
+  show_guides = false,
+  update_events = "TextChanged,InsertLeave",
+  guides = {
+    mid_item = "├─",
+    last_item = "└─",
+    nested_top = "│ ",
+    whitespace = "  ",
+  },
+  -- Options for opening aerial in a floating win
+  float = {
+    border = "rounded",
+
+    -- Enum: cursor, editor, win
+    relative = "editor",
+
+    -- They can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
+    -- min_height and max_height can be a list of mixed types.
+    -- min_height = {8, 0.1} means "the greater of 8 rows or 10% of total"
+    max_height = 0.9,
+    height = nil,
+    min_height = { 8, 0.1 },
+
+    override = function(conf)
+      -- This is the config that will be passed to nvim_open_win.
+      -- Change values here to customize the layout
+      return conf
+    end,
+  },
+  treesitter = {
+    update_delay = 300,
+  },
+  markdown = {
+    update_delay = 300,
+  },
+  lsp = {
+    diagnostics_trigger_update = true,
+
+    update_when_errors = true,
+  },
+})
+EOF
+
 " Lualine
 lua << EOF
 require'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = 'gruvbox',
-    component_separators = {'', ''},
-    section_separators = {'', ''},
-    disabled_filetypes = {}
+    theme = 'everforest',
+    component_separators = { left = '', right = ''},
+    section_separators = { left = '', right = ''},
+    disabled_filetypes = {},
+    always_divide_middle = true,
   },
   sections = {
     lualine_a = {'mode'},
@@ -182,7 +285,7 @@ require'lualine'.setup {
     lualine_z = {}
   },
   tabline = {},
-  extensions = {}
+  extensions = {'fugitive', 'chadtree'}
 }
 EOF
 
@@ -233,6 +336,8 @@ nnoremap <silent> <Space>bw :BufferOrderByWindowNumber<CR>
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
+let g:python3_host_prog = '/usr/bin/python3'
+
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
       \ <SID>check_back_space() ? "\<TAB>" :
@@ -249,7 +354,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 
 " Make <CR> auto-select the first completion item and notify coc.nvim to
 " format on enter, <cr> could be remapped by other vim plugin
-inoremap <silent><expr> <c-cr> pumvisible() ? coc#_select_confirm()
+inoremap <silent><expr> <NL> pumvisible() ? coc#_select_confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " Use `[g` and `]g` to navigate diagnostics
@@ -340,12 +445,12 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 " MarkDown preview
 " set to 1, nvim will open the preview window after entering the markdown buffer
 " default: 0
-let g:mkdp_auto_start = 1
+let g:mkdp_auto_start = 0
 
 " set to 1, the nvim will auto close current preview window when change
 " from markdown buffer to another buffer
 " default: 1
-let g:mkdp_auto_close = 1
+let g:mkdp_auto_close = 0
 
 " set to 1, the vim will refresh markdown when save the buffer or
 " leave from insert mode, default 0 is auto refresh markdown as you edit or
