@@ -24,3 +24,4 @@ set fish_cursor_visual block blink
 
 # ls -a
 alias lsa="ls -a"
+alias clk="tty-clock -cs"

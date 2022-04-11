@@ -55,6 +55,8 @@ Plug 'kyazdani42/nvim-web-devicons'
 
 Plug 'lukas-reineke/indent-blankline.nvim'
 
+Plug 'norcalli/nvim-colorizer.lua'
+
 " == QoL
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
@@ -62,6 +64,8 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'ms-jpq/chadtree', {'branch': 'chad', 'do': 'python3 -m chadtree deps'}
 
 Plug 'stevearc/aerial.nvim'
+
+Plug 'ggandor/lightspeed.nvim'
 
 Plug 'tversteeg/registers.nvim', { 'branch': 'main' }
 
@@ -97,12 +101,16 @@ let g:dashboard_custom_header = [
 
 let g:dashboard_default_executive ='telescope'
 
+" Indent Blankline
 :lua require('indent_blankline').setup {char = "|", buftype_exclude = {"terminal"}}
 
 let g:indent_blankline_space_char = '·'
 let g:indent_blankline_use_treesitter = v:true
 let g:indent_blankline_show_first_indent_level = v:false
 let g:indent_blankline_show_end_of_line = v:true
+
+"CSS Colors
+:lua require('colorizer').setup()
 
 " Comments
 :lua require('kommentary.config').use_extended_mappings()
