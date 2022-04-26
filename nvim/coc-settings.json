@@ -8,7 +8,7 @@
     }
   },
   "python.formatting.provider": "black",
-  "python.formatting.blackArgs": ["--line-length=150"],
+  "python.formatting.blackArgs": ["--line-length=88"],
   "python.formatting.blackPath": "/usr/local/bin/black",
   "htmldjango.djhtml.tabWidth": 2,
   "markdownlint.onOpen": "true",
