@@ -57,9 +57,12 @@ Plug 'lukas-reineke/indent-blankline.nvim'
 
 Plug 'norcalli/nvim-colorizer.lua'
 
+Plug 'folke/todo-comments.nvim'
+
 " == QoL
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 Plug 'ms-jpq/chadtree', {'branch': 'chad', 'do': 'python3 -m chadtree deps'}
 
@@ -109,17 +112,30 @@ let g:indent_blankline_use_treesitter = v:true
 let g:indent_blankline_show_first_indent_level = v:false
 let g:indent_blankline_show_end_of_line = v:true
 
-"CSS Colors
+" CSS Colors
 :lua require('colorizer').setup()
+
+" Todo Comments
+lua << EOF
+  require("todo-comments").setup {
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+  }
+EOF
 
 " Comments
 :lua require('kommentary.config').use_extended_mappings()
 
 " Telescope
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>ff <cmd>Telescope find_files hidden=true<cr>
+nnoremap <leader>fa <cmd>Telescope find_files hidden=true no_ignore=true<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fs <cmd>Telescope grep_string<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>ft <cmd>TodoTelescope<cr>
+nnoremap <leader>fr <cmd>Telescope resume<cr>
 
 lua << EOF
 require('telescope').setup{
@@ -139,7 +155,7 @@ require('telescope').setup{
     initial_mode = "insert",
     selection_strategy = "reset",
     sorting_strategy = "descending",
-    layout_strategy = "vertical",
+    layout_strategy = "horizontal",
     layout_config = {
       horizontal = {
         mirror = false,
@@ -163,9 +179,21 @@ require('telescope').setup{
     qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
 
     -- Developer configurations: Not meant for general override
-    buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
+    buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker,
+    extensions = {
+        fzf = {
+            fuzzy = true,                    -- false will only do exact matching
+            override_generic_sorter = true,  -- override the generic sorter
+            override_file_sorter = true,     -- override the file sorter
+            case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                                             -- the default case_mode is "smart_case"
+        },
+    }
   }
 }
+-- To get fzf loaded and working with telescope, you need to call
+-- load_extension, somewhere after setup function:
+require('telescope').load_extension('fzf')
 EOF
 
 " ChadTree

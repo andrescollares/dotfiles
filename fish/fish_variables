@@ -3,9 +3,11 @@
 SETUVAR __fish_initialized:3400
 SETUVAR _fish_abbr_clk:tty\x2dclock\x20\x2dcs
 SETUVAR _fish_abbr_ex:explorer\x2eexe
+SETUVAR _fish_abbr_gaa:git\x20add\x20\x2dA
 SETUVAR _fish_abbr_lsa:ls\x20\x2da
 SETUVAR _fish_abbr_nv:nvim
 SETUVAR _fish_abbr_wb:cd\x20/home/andres/wenn\x2dcopy/wenn\x2dbackend
+SETUVAR _fish_abbr_wenv:\x2e\x20/home/andres/\x2elocal/share/virtualenvs/wenn\x2dlYyxMLSc/bin/activate\x2efish
 SETUVAR fish_color_autosuggestion:4c566a
 SETUVAR fish_color_cancel:\x2dr
 SETUVAR fish_color_command:81a1c1
