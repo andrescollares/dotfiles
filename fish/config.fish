@@ -22,6 +22,4 @@ set fish_cursor_replace_one line blink
 # visual mode, but due to fish_cursor_default, is redundant here
 set fish_cursor_visual block blink
 
-# ls -a
-alias lsa="ls -a"
-alias clk="tty-clock -cs"
+fish_add_path /home/andres/.local/bin
