@@ -33,6 +33,10 @@ set undodir=~/.config/nvim/undo
 " Unir la columna de numero de línea con la de signo
 set signcolumn=number
 
+" Case insensitive search if no uppercase characters
+" set ignorecase
+" set smartcase
+
 " Abrir el archivo en el último lugar editado
 autocmd BufRead * autocmd FileType <buffer> ++once
       \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
@@ -128,14 +132,14 @@ EOF
 :lua require('kommentary.config').use_extended_mappings()
 
 " Telescope
-nnoremap <leader>ff <cmd>Telescope find_files hidden=true<cr>
-nnoremap <leader>fa <cmd>Telescope find_files hidden=true no_ignore=true<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fs <cmd>Telescope grep_string<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-nnoremap <leader>ft <cmd>TodoTelescope<cr>
-nnoremap <leader>fr <cmd>Telescope resume<cr>
+nnoremap <leader>ff <cmd>Telescope find_files hidden=true theme=dropdown<cr>
+nnoremap <leader>fa <cmd>Telescope find_files hidden=true no_ignore=true theme=dropdown<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep theme=dropdown<cr>
+nnoremap <leader>fs <cmd>Telescope grep_string theme=dropdown<cr>
+nnoremap <leader>fb <cmd>Telescope buffers theme=dropdown<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags theme=dropdown<cr>
+nnoremap <leader>ft <cmd>TodoTelescope theme=dropdown<cr>
+nnoremap <leader>fr <cmd>Telescope resume theme=dropdown<cr>
 
 lua << EOF
 require('telescope').setup{
@@ -155,7 +159,7 @@ require('telescope').setup{
     initial_mode = "insert",
     selection_strategy = "reset",
     sorting_strategy = "descending",
-    layout_strategy = "horizontal",
+    layout_strategy = "vertical",
     layout_config = {
       horizontal = {
         mirror = false,

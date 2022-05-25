@@ -16,7 +16,8 @@ function fish_prompt
     printf '%s' (prompt_pwd)
     set_color normal
 
-    set_color red
+    set -g __fish_git_prompt_showupstream verbose
+    set -g __fish_git_prompt_showcolorhints 1
     printf '%s' (fish_git_prompt)
     set_color normal
 
